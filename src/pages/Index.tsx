@@ -1,11 +1,46 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { StudentDashboard } from '@/components/student/StudentDashboard';
+import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
 const Index = () => {
+  const { user, profile, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.href = '/auth';
+    }
+  }, [user, loading]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-red-50">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-primary rounded-full animate-pulse mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !profile) {
+    return null;
+  }
+
+  // Route based on user role
+  if (profile.role === 'student') {
+    return <StudentDashboard />;
+  }
+
+  if (profile.role === 'university_admin' || profile.role === 'super_admin') {
+    return <AdminDashboard />;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+        <h1 className="text-4xl font-bold mb-4">Mars Inc. Quiz Management</h1>
+        <p className="text-xl text-muted-foreground">Role not recognized. Please contact support.</p>
       </div>
     </div>
   );
