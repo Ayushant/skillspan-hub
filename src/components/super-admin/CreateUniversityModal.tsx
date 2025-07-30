@@ -109,13 +109,15 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
     setLoading(true);
 
     try {
-      // First, create the university admin user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // First, create the university admin user using regular signup
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.admin_email,
         password: formData.admin_password,
-        user_metadata: {
-          full_name: `${formData.name} Admin`,
-          role: 'university_admin'
+        options: {
+          data: {
+            full_name: `${formData.name} Admin`,
+            role: 'university_admin'
+          }
         }
       });
 
