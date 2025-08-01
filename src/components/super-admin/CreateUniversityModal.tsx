@@ -109,16 +109,14 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
     setLoading(true);
 
     try {
-      // First, create the university admin user using regular signup
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // First, create the university admin user using admin signup (auto-confirmed)
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: formData.admin_email,
         password: formData.admin_password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-          data: {
-            full_name: `${formData.name} Admin`,
-            role: 'university_admin'
-          }
+        email_confirm: true, // Auto-confirm email for admin-created accounts
+        user_metadata: {
+          full_name: `${formData.name} Admin`,
+          role: 'university_admin'
         }
       });
 
