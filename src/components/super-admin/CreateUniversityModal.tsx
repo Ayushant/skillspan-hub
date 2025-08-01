@@ -109,64 +109,30 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
     setLoading(true);
 
     try {
-      // First, create the university admin user using admin signup (auto-confirmed)
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: formData.admin_email,
-        password: formData.admin_password,
-        email_confirm: true, // Auto-confirm email for admin-created accounts
-        user_metadata: {
+      // Get current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Authentication required');
+      }
+
+      // Call Edge Function to create university admin (server-side admin API)
+      const { data, error } = await supabase.functions.invoke('create-university-admin', {
+        body: {
+          email: formData.admin_email,
+          password: formData.admin_password,
           full_name: `${formData.name} Admin`,
-          role: 'university_admin'
+          university_name: formData.name,
+          license_limit: formData.license_limit
         }
       });
 
-      if (authError) {
-        console.error('Auth signup error:', authError);
-        throw new Error(`Failed to create admin user: ${authError.message}`);
+      if (error) {
+        console.error('Edge function error:', error);
+        throw new Error(error.message || 'Failed to create university');
       }
 
-      if (!authData.user) {
-        throw new Error('Failed to create admin user');
-      }
-
-      // Wait for the profile to be created (the trigger should create it)
-      let profile = null;
-      let retries = 0;
-      const maxRetries = 10;
-      
-      while (!profile && retries < maxRetries) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', authData.user.id)
-          .maybeSingle();
-        
-        if (profileData) {
-          profile = profileData;
-        } else {
-          // Wait 500ms before retrying
-          await new Promise(resolve => setTimeout(resolve, 500));
-          retries++;
-        }
-      }
-
-      if (!profile) {
-        throw new Error('Failed to create admin profile');
-      }
-
-      // Create the university record
-      const { error: universityError } = await supabase
-        .from('universities')
-        .insert({
-          name: formData.name,
-          admin_id: profile.id,
-          license_limit: formData.license_limit,
-          license_expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-          status: 'active'
-        });
-
-      if (universityError) {
-        throw new Error(universityError.message);
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create university');
       }
 
       toast({
