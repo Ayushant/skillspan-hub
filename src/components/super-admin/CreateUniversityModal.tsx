@@ -129,12 +129,37 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
         throw new Error('Failed to create admin user');
       }
 
+      // Wait for the profile to be created (the trigger should create it)
+      let profile = null;
+      let retries = 0;
+      const maxRetries = 10;
+      
+      while (!profile && retries < maxRetries) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', authData.user.id)
+          .maybeSingle();
+        
+        if (profileData) {
+          profile = profileData;
+        } else {
+          // Wait 500ms before retrying
+          await new Promise(resolve => setTimeout(resolve, 500));
+          retries++;
+        }
+      }
+
+      if (!profile) {
+        throw new Error('Failed to create admin profile');
+      }
+
       // Create the university record
       const { error: universityError } = await supabase
         .from('universities')
         .insert({
           name: formData.name,
-          admin_id: authData.user.id,
+          admin_id: profile.id,
           license_limit: formData.license_limit,
           license_expiry: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
           status: 'active'
