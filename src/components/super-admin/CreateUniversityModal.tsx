@@ -114,9 +114,11 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
         email: formData.admin_email,
         password: formData.admin_password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: `${formData.name} Admin`,
-            role: 'university_admin'
+            role: 'university_admin',
+            email_confirm: false // Skip email verification for admin users
           }
         }
       });

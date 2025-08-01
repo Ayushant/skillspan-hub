@@ -326,24 +326,16 @@ export const SuperAdminDashboard: React.FC = () => {
   return (
     <div className={`min-h-screen bg-gray-50 ${darkMode ? 'dark' : ''}`}>
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-        sidebarCollapsed ? '-translate-x-full' : 'translate-x-0'
-      } lg:translate-x-0 lg:static lg:inset-0`}>
+      <div className={`fixed inset-y-0 left-0 z-50 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        sidebarCollapsed ? 'w-16' : 'w-64'
+      }`}>
         <div className="flex items-center justify-between h-16 px-6 border-b">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">M</span>
             </div>
-            <span className="font-semibold text-gray-900">Mars Admin</span>
+            {!sidebarCollapsed && <span className="font-semibold text-gray-900">Mars Admin</span>}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarCollapsed(true)}
-            className="lg:hidden"
-          >
-            <Menu className="w-4 h-4" />
-          </Button>
         </div>
 
         <nav className="mt-6 px-3">
@@ -355,17 +347,18 @@ export const SuperAdminDashboard: React.FC = () => {
                 activeTab === item.id
                   ? 'bg-blue-100 text-blue-700 font-medium'
                   : 'text-gray-700 hover:bg-gray-100'
-              }`}
+              } ${sidebarCollapsed ? 'justify-center' : ''}`}
+              title={sidebarCollapsed ? item.label : ''}
             >
               <item.icon className="w-5 h-5 mr-3" />
-              {item.label}
+              {!sidebarCollapsed && item.label}
             </button>
           ))}
         </nav>
       </div>
 
       {/* Main Content */}
-      <div className={`${sidebarCollapsed ? '' : 'lg:ml-64'}`}>
+      <div className={`${sidebarCollapsed ? 'ml-16' : 'ml-64'}`}>
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b h-16 flex items-center justify-between px-6">
           <div className="flex items-center">
@@ -452,13 +445,6 @@ export const SuperAdminDashboard: React.FC = () => {
         </main>
       </div>
 
-      {/* Mobile Sidebar Overlay */}
-      {!sidebarCollapsed && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarCollapsed(true)}
-        />
-      )}
     </div>
   );
 };
