@@ -117,14 +117,14 @@ export const CreateUniversityModal: React.FC<CreateUniversityModalProps> = ({
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: `${formData.name} Admin`,
-            role: 'university_admin',
-            email_confirm: false // Skip email verification for admin users
+            role: 'university_admin'
           }
         }
       });
 
       if (authError) {
-        throw new Error(authError.message);
+        console.error('Auth signup error:', authError);
+        throw new Error(`Failed to create admin user: ${authError.message}`);
       }
 
       if (!authData.user) {
