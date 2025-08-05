@@ -37,6 +37,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { AddStudentModal } from '@/components/university-admin/AddStudentModal';
 
 interface DashboardStats {
   availableLicenses: number;
@@ -79,6 +80,7 @@ export const UniversityAdminDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [canStartQuiz, setCanStartQuiz] = useState(true);
   const [hasActiveSessions, setHasActiveSessions] = useState(false);
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -271,10 +273,7 @@ export const UniversityAdminDashboard: React.FC = () => {
   };
 
   const handleAddStudent = () => {
-    toast({
-      title: 'Add Student',
-      description: 'Student creation modal will open here',
-    });
+    setShowAddStudentModal(true);
   };
 
   if (loading) {
@@ -564,6 +563,13 @@ export const UniversityAdminDashboard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Student Modal */}
+      <AddStudentModal
+        isOpen={showAddStudentModal}
+        onClose={() => setShowAddStudentModal(false)}
+        onSuccess={fetchDashboardData}
+      />
     </div>
   );
 };
