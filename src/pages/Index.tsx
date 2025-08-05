@@ -7,10 +7,12 @@ const Index = () => {
   const { user, profile, loading } = useAuth();
 
   useEffect(() => {
+    console.log('Index page - user:', !!user, 'profile:', profile?.role, 'loading:', loading);
     if (!loading && !user) {
+      console.log('Redirecting to /auth - no user');
       window.location.href = '/auth';
     }
-  }, [user, loading]);
+  }, [user, loading, profile]);
 
   if (loading) {
     return (

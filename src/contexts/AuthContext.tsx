@@ -40,12 +40,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Profile fetch error:', error);
         throw error;
       }
+      
+      if (!data) {
+        console.warn('No profile found for user:', userId);
+        setProfile(null);
+        return;
+      }
+      
       console.log('Profile fetched successfully:', data);
       setProfile(data);
     } catch (error) {
@@ -115,6 +122,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: 'Welcome back!',
         description: 'You have successfully signed in.',
       });
+
+      // Navigate to main page after successful login
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
 
       return { error: null };
     } catch (error) {
