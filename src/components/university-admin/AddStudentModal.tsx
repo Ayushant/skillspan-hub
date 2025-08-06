@@ -85,17 +85,32 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({
       if (authError) throw authError;
       if (!authData.user) throw new Error('Failed to create student account');
 
-      // Wait a moment for the profile to be created by the trigger
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Wait and retry to get the student's profile (created by trigger)
+      let studentProfile = null;
+      let retries = 5;
+      
+      while (retries > 0 && !studentProfile) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', authData.user.id)
+          .maybeSingle();
+          
+        if (error) throw error;
+        
+        if (data) {
+          studentProfile = data;
+          break;
+        }
+        
+        retries--;
+      }
 
-      // Get the student's profile
-      const { data: studentProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', authData.user.id)
-        .single();
-
-      if (profileError) throw profileError;
+      if (!studentProfile) {
+        throw new Error('Failed to create student profile. Please try again.');
+      }
 
       // Get license package info
       const { data: licensePackages, error: packageError } = await supabase
