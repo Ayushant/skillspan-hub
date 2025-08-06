@@ -85,12 +85,14 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({
       if (authError) throw authError;
       if (!authData.user) throw new Error('Failed to create student account');
 
-      // Wait and retry to get the student's profile (created by trigger)
+      console.log('User created:', authData.user.id);
+
+      // Try to get the student's profile (created by trigger)
       let studentProfile = null;
-      let retries = 5;
+      let retries = 3;
       
       while (retries > 0 && !studentProfile) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         const { data, error } = await supabase
           .from('profiles')
@@ -98,18 +100,39 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({
           .eq('user_id', authData.user.id)
           .maybeSingle();
           
-        if (error) throw error;
-        
-        if (data) {
+        if (error) {
+          console.error('Profile query error:', error);
+        } else if (data) {
           studentProfile = data;
+          console.log('Profile found:', studentProfile);
           break;
         }
         
         retries--;
+        console.log(`Profile not found, retries left: ${retries}`);
       }
 
+      // If trigger didn't create profile, create it manually
       if (!studentProfile) {
-        throw new Error('Failed to create student profile. Please try again.');
+        console.log('Creating profile manually...');
+        const { data: createdProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            email: formData.email,
+            full_name: formData.fullName,
+            role: 'student',
+          })
+          .select('id')
+          .single();
+
+        if (createError) {
+          console.error('Manual profile creation error:', createError);
+          throw new Error(`Failed to create student profile: ${createError.message}`);
+        }
+        
+        studentProfile = createdProfile;
+        console.log('Profile created manually:', studentProfile);
       }
 
       // Get license package info
