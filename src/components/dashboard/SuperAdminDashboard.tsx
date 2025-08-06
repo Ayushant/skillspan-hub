@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UniversityManagement } from '@/components/super-admin/UniversityManagement';
+import { EnhancedSuperAdminDashboard } from '@/components/super-admin/EnhancedSuperAdminDashboard';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -198,128 +199,7 @@ export const SuperAdminDashboard: React.FC = () => {
       case 'reports':
         return <div className="p-6 text-center text-gray-500">Reports section coming soon...</div>;
       default:
-        return (
-          <div className="space-y-6">
-            {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
-              <h1 className="text-2xl font-bold mb-2">
-                Welcome back, {profile?.full_name || 'Super Admin'}
-              </h1>
-              <p className="opacity-90">
-                Today is {new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Total Universities</p>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalUniversities}</p>
-                    </div>
-                    <Building2 className="w-8 h-8 text-blue-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Active Students</p>
-                      <p className="text-3xl font-bold text-gray-900">{stats.activeStudents}</p>
-                    </div>
-                    <Users className="w-8 h-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Total Licenses</p>
-                      <p className="text-3xl font-bold text-gray-900">{stats.totalLicenses}</p>
-                      <p className="text-xs text-gray-500">{stats.activeLicenses} active</p>
-                    </div>
-                    <CreditCard className="w-8 h-8 text-purple-500" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">Monthly Revenue</p>
-                      <p className="text-3xl font-bold text-gray-900">${stats.totalRevenue.toLocaleString()}</p>
-                    </div>
-                    <TrendingUp className="w-8 h-8 text-orange-500" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Recent Universities Table */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Recent Universities</span>
-                  <Badge variant="secondary">{universities.length} Total</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>University Name</TableHead>
-                      <TableHead>Admin Email</TableHead>
-                      <TableHead>License Limit</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Expires</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {universities.slice(0, 5).map((university) => (
-                      <TableRow key={university.id}>
-                        <TableCell className="font-medium">{university.name}</TableCell>
-                        <TableCell>{university.admin_email}</TableCell>
-                        <TableCell>{university.license_limit}</TableCell>
-                        <TableCell>
-                          <Badge 
-                            variant={university.status === 'active' ? 'default' : 'secondary'}
-                          >
-                            {university.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(university.license_expiry).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {universities.length > 5 && (
-                  <div className="mt-4 text-center">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setActiveTab('universities')}
-                    >
-                      View All Universities
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        );
+        return <EnhancedSuperAdminDashboard />;
     }
   };
 

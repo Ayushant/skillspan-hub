@@ -145,6 +145,7 @@ export type Database = {
           full_name: string
           id: string
           role: Database["public"]["Enums"]["user_role"]
+          university_id: string | null
           updated_at: string
           user_id: string
         }
@@ -154,6 +155,7 @@ export type Database = {
           full_name: string
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          university_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -163,6 +165,7 @@ export type Database = {
           full_name?: string
           id?: string
           role?: Database["public"]["Enums"]["user_role"]
+          university_id?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -416,9 +419,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_university_license_limit: {
+        Args: { p_university_id: string }
+        Returns: boolean
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["user_role"]
+      }
+      get_university_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          university_id: string
+          university_name: string
+          admin_email: string
+          total_licenses: number
+          used_licenses: number
+          remaining_licenses: number
+          usage_percentage: number
+        }[]
       }
     }
     Enums: {
